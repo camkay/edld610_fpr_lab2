@@ -5,6 +5,10 @@ date: "4/17/2019"
 output: html_document
 ---
 
+```{r setup, include = FALSE}
+library(tidyverse)
+```
+
 ## Part A: Multiple Models
 
 Run the code below to load the following dataset.
@@ -71,7 +75,20 @@ You now should have access to all the data you’ll need for the following.
 ### 2. Use the sw_species list to (a) identify species that have known hair colors and (b) identify what those hair colors are
 
 ```{r partb_q2}
-sw_species
+# extract names
+sw_species_names <- map_chr(sw_species, "name")
+
+# extract hair colours
+sw_species_hair  <- map_chr(sw_species, "hair_colors")
+
+# combine character vectors
+sw_species_df <- tibble(sw_species_names,
+                        sw_species_hair)
+
+# filter non-n/a
+sw_species_df %>%
+  filter(sw_species_hair != "n/a",
+         sw_species_hair != "none")
 ```
 
 ## Part C: Some basic API calls
