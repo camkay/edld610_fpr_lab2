@@ -43,12 +43,37 @@ benchmarks <- benchmarks %>%
 
 ```{r parta_q1}
 
+benchmarks_split <- split(benchmarks, benchmarks$sid)
+
+model <- map(benchmarks_split, ~lm(math ~ wave, data = .x))
+
+model
+
 ```
 
 ### 2. Plot the distribution of slopes for each student. Annotate the plot with a vertical line for the mean.
 
 ```{r parta_q2}
 
+coefs <- map(model, coef)
+
+slopes <- map_dbl(coefs, 2)
+
+relation <- tibble(subject = names(slopes),
+                   slope = slopes)
+
+ggplot(relation, aes(slope)) +
+    geom_histogram(fill = "#24B8C7",
+                   color = "#107D88",
+                   alpha = 0.5) +
+    theme_minimal() +
+    geom_vline(aes(xintercept = mean(slope, na.rm = TRUE)),
+               color = "gray30", 
+               lty = "dashed") +
+    labs(x = "Slope",
+         y = "Count",
+         title = "Figure 1. Distribution of slopes for each student")
+  
 ```
 
 ## Part B: Star Wars
@@ -56,7 +81,7 @@ benchmarks <- benchmarks %>%
 Install and load the {repurrrsive} package.
 
 ```{r partb_load_data}
-# install.packages("repurrrsive")
+#install.packages("repurrrsive")
 library(repurrrsive)
 ```
 
@@ -65,6 +90,14 @@ You now should have access to all the data you’ll need for the following.
 ### 1. Use the sw_films list to identify how many characters were represented in each film.
 
 ```{r partb_q1}
+
+sw_films <- sw_films
+
+sw_films[[1]][[7]] #identifies 7th element (character vector) within first list 
+
+sw_characters <- map(sw_films, 7) #does the above, but iterates through every film
+
+map_dbl(sw_characters, ~length(.x))
 
 ```
 
