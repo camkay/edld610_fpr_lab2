@@ -71,7 +71,7 @@ You now should have access to all the data you’ll need for the following.
 ### 2. Use the sw_species list to (a) identify species that have known hair colors and (b) identify what those hair colors are
 
 ```{r partb_q2}
-
+sw_species
 ```
 
 ## Part C: Some basic API calls
