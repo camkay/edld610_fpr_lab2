@@ -112,7 +112,22 @@ You’ll note it looks very similar to the lists we’ve been working with. If y
 ### 1. Create a data frame that has two columns listing the names of every character in the first film (i.e., all the characters in sw_films[[1]]$characters), and the total number of films each character appeared in (note, this may take a minute or two).
 
 ```{r partc_q1}
+# get character list
+sw_films_list <- map(sw_films[[1]]$characters, function(url) {
+  content(GET(url), "parsed")
+})
 
+# get character names
+sw_films_names  <- map_chr(sw_films_list, ~.x$name)
+
+# get character movies count
+sw_films_movies <- map_int(sw_films_list, ~length(.x$films))
+
+# create a datarame from the two columns
+sw_films_df     <- data.frame(sw_films_names, sw_films_movies)
+
+# look at the df
+sw_films_df 
 ```
 
 ### 2. Add an additional column to your data frame that includes the names of all the films each character was in (BONUS).
