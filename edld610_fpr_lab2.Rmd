@@ -11,15 +11,17 @@ output:
 ---
 
 ```{r setup, include = FALSE}
-# Set knitr options
+# set knitr options
 knitr::opts_chunk$set(echo = TRUE,
                       message = FALSE,
                       warning = FALSE,
                       fig.width = 7.5,
                       fig.height = 4.5)
 
+# load packages
 library(tidyverse)
 library(repurrrsive)
+library(httr)
 ```
 
 ## Part A: Multiple Models
@@ -97,8 +99,8 @@ ggplot(relation, aes(slope)) +
 Install and load the {repurrrsive} package.
 
 ```{r partb_load_data}
-#install.packages("repurrrsive")
-#library(repurrrsive)
+# install.packages("repurrrsive")
+# library(repurrrsive)
 ```
 
 You now should have access to all the data you’ll need for the following.
@@ -106,8 +108,6 @@ You now should have access to all the data you’ll need for the following.
 ### 1. Use the sw_films list to identify how many characters were represented in each film. (Ash)
 
 ```{r partb_q1}
-
-sw_films <- sw_films
 
 sw_films[[1]][[7]] #identifies 7th element (character vector) within first list 
 
@@ -147,7 +147,6 @@ sw_films[[1]]$characters[1]
 The above provides the url necessary to make an API call for all the information available on the first character in the first film. You can get this information into R with the following code
 
 ```{r partc_import_code}
-library(httr)
 char_1 <- GET(sw_films[[1]]$characters[1]) %>%
     content("parsed") 
 ```
@@ -163,13 +162,13 @@ sw_films_list <- map(sw_films[[1]]$characters, function(url) {
 })
 
 # get character names
-sw_films_names  <- map_chr(sw_films_list, ~.x$name)
+sw_films_chars  <- map_chr(sw_films_list, ~.x$name)
 
 # get character movies count
 sw_films_movies <- map_int(sw_films_list, ~length(.x$films))
 
 # create a datarame from the two columns
-sw_films_df     <- data.frame(sw_films_names, sw_films_movies)
+sw_films_df     <- data.frame(sw_films_chars, sw_films_movies)
 
 # look at the df
 sw_films_df 
@@ -178,5 +177,19 @@ sw_films_df
 ### 2. Add an additional column to your data frame that includes the names of all the films each character was in (BONUS). (Cam)
 
 ```{r partc_q2}
+# extract film urls for each character
+sw_films_urls <- map(sw_films_list, "films")
+
+# identify film names for each character
+sw_films_names <- map(sw_films_urls, ~map(.x, ~content(GET(.x), "parsed")$title))
+
+# flatten to include in df
+sw_films_names_flat <- map_chr(sw_films_names, paste, collapse = ", ")
+
+# combine with sw_films_df
+sw_films_df <- cbind(sw_films_df, sw_films_names_flat)
+
+# show sw_films_df
+tibble(sw_films_df)
 
 ```
